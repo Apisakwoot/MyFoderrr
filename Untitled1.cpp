@@ -25,3 +25,35 @@ int main()
    cout<<"Eror"<<endl;
 
 }
+xsdfsdasdasd
+
+
+#include <iostream>
+using namespace std;
+int main()
+{
+  cout<<"apisakwoot wutcharachaiwaphon m5/4 no14."<<endl;
+
+   int number;
+     cout<<"--Program for Menu--"<<endl;
+	 cout<<"Pless Number1 for Program Tax Payment"<<endl;
+     cout<<"Pless Number =";
+     cin>>number;
+     if(number==1)
+     {  
+        float information,name;
+     	cout<<"--Program Tax Payment--"<<endl;
+     	cout<<"Pless your name =";cin>>information;
+     	cout<<"Pless your money =";cin>>name;
+     	
+     	if(<= 50000)
+     	{
+     		cout<<"sadasdoihasd"<<endl;
+     		
+		}
+     	
+	 }
+ 
+
+
+
