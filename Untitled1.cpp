@@ -55,5 +55,63 @@ int main()
 	 }
  
 
+sdasdasdsa
 
+
+
+
+
+#include <iostream>
+using namespace std;
+int main()
+{
+  cout<<"apisakwoot wutcharachaiwaphon m5/4 no14."<<endl;
+
+    int number;
+     cout<<"--Program for Menu--"<<endl;
+	 cout<<"Pless Number1 for Program Tax Payment"<<endl;
+     cout<<"Pless Number =";
+     cin>>number;
+     if(number==1)
+     
+     cout<<"--Program Tax Payment--"<<endl;
+     
+    char name[1],value;
+	    cout<<"Pless your name =";cin>>name;
+    {   
+	
+		float money,tax;
+     	
+     	cout<<"Pless your money =";cin>>money;
+     	
+     	
+     	if (money <= 50000)
+     	
+		{
+            tax = money * 0.03;
+        } 
+        
+		if (50001 <= money <= 100000)
+		
+		{
+            tax = money * 0.05;
+        } 
+		
+		if (100001 <= money <= 200000)
+		
+		{
+            tax = money * 0.07;
+		}
+            
+        if (money >= 200001)
+        
+		{
+            tax = money * 0.1;
+		}
+		cout<<"--Your net money--"<<endl;
+		cout << "Your name: " << name << endl;
+		cout << "Your tax is: " << tax << " THB" << endl;
+		cout << "Your net money:" << tax + money << "THB"  << endl;
+	}
+}
 
