@@ -117,10 +117,9 @@ int main()
 #include <iostream>
 using namespace std;
 int main()
-{  
-   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
-   string nickname;
+{  string nickname;
    int i,a=0,round;
+   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
    cout<<"--Program for Loop--"<<endl;
    cout<<"Input Nickname =";cin>>nickname;
    cout<<"Input Number for End Round =";cin>>round;
@@ -139,9 +138,9 @@ int main()
 using namespace std;
 int main()
 {  
-   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
    string nickname;
    int i=1,a=0,round;
+   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
    cout<<"--Program for Loop--"<<endl;
    cout<<"Input Nickname =";cin>>nickname;
    cout<<"Input Number for End Round =";cin>>round;
@@ -150,6 +149,28 @@ int main()
    	 a=a+i;
    	 cout<<"a["<<i<<"]="<<a<<endl;
    	 i++;
+   }
+   return 0;
+}
+
+---------------------------------------------------
+
+	
+#include <iostream>
+using namespace std;
+int main()
+{
+   string nickname;
+   int i,a=0,id;
+   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl; 
+   cout<<"--Program for Loop--"<<endl;
+   cout<<"Input Nickname =";cin>>nickname;
+   cout<<"Input idNumber =";cin>>id;
+   while(id!=0)
+   {
+   	 a=a+i;
+   	 cout<<"a["<<i<<"]="<<a<<endl;
+   	 cin>>id;
    }
    return 0;
 }
