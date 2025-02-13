@@ -25,7 +25,7 @@ int main()
    cout<<"Eror"<<endl;
 
 }
-xsdfsdasdasd
+---------------------------------------------------
 
 
 #include <iostream>
@@ -55,9 +55,7 @@ int main()
 	 }
  
 
-sdasdasdsa
-
-
+---------------------------------------------------
 
 
 
@@ -115,8 +113,7 @@ int main()
 	}
 }
 
-sdadasdadadasd
-
+---------------------------------------------------
 #include <iostream>
 using namespace std;
 int main()
@@ -131,6 +128,28 @@ int main()
    {
    	 a=a+i;
    	 cout<<"a["<<i<<"]="<<a<<endl;
+   }
+   return 0;
+}
+
+
+
+---------------------------------------------------
+#include <iostream>
+using namespace std;
+int main()
+{  
+   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
+   string nickname;
+   int i=1,a=0,round;
+   cout<<"--Program for Loop--"<<endl;
+   cout<<"Input Nickname =";cin>>nickname;
+   cout<<"Input Number for End Round =";cin>>round;
+   while(i<=round)
+   {
+   	 a=a+i;
+   	 cout<<"a["<<i<<"]="<<a<<endl;
+   	 i++;
    }
    return 0;
 }
