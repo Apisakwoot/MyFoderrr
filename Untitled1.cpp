@@ -115,3 +115,22 @@ int main()
 	}
 }
 
+sdadasdadadasd
+
+#include <iostream>
+using namespace std;
+int main()
+{  
+   cout<<"apisakwoot watcharachaiwaphon no 14"<<endl;
+   string nickname;
+   int i,a=0,round;
+   cout<<"--Program for Loop--"<<endl;
+   cout<<"Input Nickname =";cin>>nickname;
+   cout<<"Input Number for End Round =";cin>>round;
+   for(i=1;i<=round;i++)
+   {
+   	 a=a+i;
+   	 cout<<"a["<<i<<"]="<<a<<endl;
+   }
+   return 0;
+}
