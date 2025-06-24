@@ -1,1 +1,192 @@
+/*
+ * Arduino C++ Code for an Edge-Avoiding Sumo Robot
+ * ================================================
+ * * เป้าหมาย: หุ่นยนต์จะเคลื่อนที่ไปข้างหน้าในสนาม และเมื่อเซ็นเซอร์ตรวจจับ
+ * เจอขอบสีขาวของเวที จะทำการถอยหลังและเลี้ยวกลับเข้ามาในสนามโดยอัตโนมัติ
+ * * ฮาร์ดแวร์ที่ใช้:
+ * - Arduino Board (e.g., UNO)
+ * - 2x IR Infrared Line Follower Sensors
+ * - 2x DC Motors
+ * - 1x Motor Driver (e.g., L298N)
+ * - Robot Chassis and Power Supply (Battery)
+ *
+ * หลักการทำงานของเซ็นเซอร์ (ต้องทดสอบ):
+ * - โดยทั่วไป: อ่านค่าได้ LOW (0) เมื่ออยู่บนพื้นผิวสีเข้ม/ดำ
+ * - อ่านค่าได้ HIGH (1) เมื่ออยู่บนพื้นผิวสีสว่าง/ขาว (สะท้อนแสงดี)
+ * *** เซ็นเซอร์บางรุ่นอาจให้ค่ากลับกัน ควรทดสอบกับ Serial Monitor ก่อน ***
+ */
+
+//================================================
+// 1. การกำหนดค่า PIN (Configuration)
+//================================================
+
+// --- Pin ของเซ็นเซอร์อินฟราเรด (IR Sensors) ---
+// คุณสามารถเปลี่ยนหมายเลข Pin ได้ตามการต่อวงจรจริง
+#define SENSOR_LEFT_PIN   2  // Pin สำหรับเซ็นเซอร์ด้านซ้าย
+#define SENSOR_RIGHT_PIN  3  // Pin สำหรับเซ็นเซอร์ด้านขวา
+
+// --- Pin ควบคุมมอเตอร์ผ่าน Motor Driver (เช่น L298N) ---
+// มอเตอร์ซ้าย
+#define MOTOR_L_ENABLE    5  // ENA: Pin PWM ควบคุมความเร็ว
+#define MOTOR_L_IN1       6  // IN1
+#define MOTOR_L_IN2       7  // IN2
+
+// มอเตอร์ขวา
+#define MOTOR_R_ENABLE    10 // ENB: Pin PWM ควบคุมความเร็ว
+#define MOTOR_R_IN1       8  // IN3
+#define MOTOR_R_IN2       9  // IN4
+
+// --- ค่าที่อ่านได้จากเซ็นเซอร์ ---
+#define ON_THE_RING    LOW    // ค่าที่อ่านได้เมื่ออยู่บนพื้นสีดำ (ในสนาม)
+#define ON_THE_EDGE    HIGH   // ค่าที่อ่านได้เมื่ออยู่บนพื้นสีขาว (ขอบสนาม)
+
+// --- การตั้งค่าการเคลื่อนที่ ---
+const int MOVE_SPEED = 200; // ความเร็วในการเคลื่อนที่ (0-255)
+const int TURN_SPEED = 220; // ความเร็วในการเลี้ยว (อาจเร็วกว่าปกติเล็กน้อย)
+
+//================================================
+// 2. ฟังก์ชัน SETUP - ทำงานครั้งเดียวเมื่อเปิดเครื่อง
+//================================================
+void setup() {
+  // ตั้งค่า Pin ทั้งหมดให้เป็น OUTPUT หรือ INPUT
+  pinMode(SENSOR_LEFT_PIN, INPUT);
+  pinMode(SENSOR_RIGHT_PIN, INPUT);
+  
+  pinMode(MOTOR_L_ENABLE, OUTPUT);
+  pinMode(MOTOR_L_IN1, OUTPUT);
+  pinMode(MOTOR_L_IN2, OUTPUT);
+  
+  pinMode(MOTOR_R_ENABLE, OUTPUT);
+  pinMode(MOTOR_R_IN1, OUTPUT);
+  pinMode(MOTOR_R_IN2, OUTPUT);
+  
+  // เริ่มการสื่อสารผ่าน Serial Port สำหรับการ Debug
+  Serial.begin(9600);
+  
+  // หยุดมอเตอร์ทั้งหมดเมื่อเริ่มต้น
+  stopMotors();
+  
+  Serial.println("Starting in 2 seconds...");
+  delay(2000); // หน่วงเวลา 2 วินาที
+}
+
+
+//================================================
+// 3. ฟังก์ชัน LOOP - ทำงานวนซ้ำไปเรื่อยๆ
+//================================================
+void loop() {
+  // อ่านค่าสถานะจากเซ็นเซอร์ทั้งสองข้าง
+  int leftSensorState = digitalRead(SENSOR_LEFT_PIN);
+  int rightSensorState = digitalRead(SENSOR_RIGHT_PIN);
+
+  // แสดงผลค่าที่อ่านได้ทาง Serial Monitor เพื่อช่วยในการดีบัก
+  // Serial.print("Left: "); Serial.print(leftSensorState);
+  // Serial.print(" | Right: "); Serial.println(rightSensorState);
+
+  // --- ส่วนของตรรกะการตัดสินใจ (Decision Logic) ---
+
+  // กรณีที่ 1: เซ็นเซอร์ทั้งสองอยู่บนพื้นดำ (ปลอดภัย) -> เดินหน้าค้นหาศัตรู
+  if (leftSensorState == ON_THE_RING && rightSensorState == ON_THE_RING) {
+    moveForward();
+  }
+  
+  // กรณีที่ 2: เซ็นเซอร์ซ้ายเจอขอบขาว -> แสดงว่ากำลังจะตกซ้าย
+  else if (leftSensorState == ON_THE_EDGE && rightSensorState == ON_THE_RING) {
+    Serial.println("Left edge detected! Turning right...");
+    // ให้ถอยหลัง แล้วเลี้ยวขวา
+    moveBackward();
+    delay(320); // ปรับค่าเวลาถอยหลัง
+    turnRight();
+    delay(350); // ปรับค่าเวลาเลี้ยว
+  }
+
+  // กรณีที่ 3: เซ็นเซอร์ขวาเจอขอบขาว -> แสดงว่ากำลังจะตกขวา
+  else if (leftSensorState == ON_THE_RING && rightSensorState == ON_THE_EDGE) {
+    Serial.println("Right edge detected! Turning left...");
+    // ให้ถอยหลัง แล้วเลี้ยวซ้าย
+    moveBackward();
+    delay(320);
+    turnLeft();
+    delay(350);
+  }
+  
+  // กรณีที่ 4: เซ็นเซอร์ทั้งสองเจอขอบขาว (เช่น วิ่งเข้าขอบตรงๆ)
+  else if (leftSensorState == ON_THE_EDGE && rightSensorState == ON_THE_EDGE) {
+    Serial.println("Front edge detected! Reversing...");
+    // ให้ถอยหลังตรงๆ เป็นระยะเวลานานขึ้น แล้วค่อยเลี้ยว
+    moveBackward();
+    delay(400);
+    turnRight(); // หรือ turnLeft() ก็ได้
+    delay(450);
+  }
+}
+
+//================================================
+// 4. ฟังก์ชันควบคุมมอเตอร์ (Motor Control Functions)
+//================================================
+
+// ฟังก์ชันเดินหน้า
+void moveForward() {
+  // มอเตอร์ซ้ายหมุนไปข้างหน้า
+  digitalWrite(MOTOR_L_IN1, HIGH);
+  digitalWrite(MOTOR_L_IN2, LOW);
+  analogWrite(MOTOR_L_ENABLE, MOVE_SPEED);
+  
+  // มอเตอร์ขวาหมุนไปข้างหน้า
+  digitalWrite(MOTOR_R_IN1, HIGH);
+  digitalWrite(MOTOR_R_IN2, LOW);
+  analogWrite(MOTOR_R_ENABLE, MOVE_SPEED);
+}
+
+// ฟังก์ชันถอยหลัง
+void moveBackward() {
+  // มอเตอร์ซ้ายหมุนกลับหลัง
+  digitalWrite(MOTOR_L_IN1, LOW);
+  digitalWrite(MOTOR_L_IN2, HIGH);
+  analogWrite(MOTOR_L_ENABLE, MOVE_SPEED);
+  
+  // มอเตอร์ขวาหมุนกลับหลัง
+  digitalWrite(MOTOR_R_IN1, LOW);
+  digitalWrite(MOTOR_R_IN2, HIGH);
+  analogWrite(MOTOR_R_ENABLE, MOVE_SPEED);
+}
+
+// ฟังก์ชันเลี้ยวขวา (หมุนกับที่)
+void turnRight() {
+  // มอเตอร์ซ้ายหมุนไปข้างหน้า
+  digitalWrite(MOTOR_L_IN1, HIGH);
+  digitalWrite(MOTOR_L_IN2, LOW);
+  analogWrite(MOTOR_L_ENABLE, TURN_SPEED);
+  
+  // มอเตอร์ขวาหมุนกลับหลัง
+  digitalWrite(MOTOR_R_IN1, LOW);
+  digitalWrite(MOTOR_R_IN2, HIGH);
+  analogWrite(MOTOR_R_ENABLE, TURN_SPEED);
+}
+
+// ฟังก์ชันเลี้ยวซ้าย (หมุนกับที่)
+void turnLeft() {
+  // มอเตอร์ซ้ายหมุนกลับหลัง
+  digitalWrite(MOTOR_L_IN1, LOW);
+  digitalWrite(MOTOR_L_IN2, HIGH);
+  analogWrite(MOTOR_L_ENABLE, TURN_SPEED);
+  
+  // มอเตอร์ขวาหมุนไปข้างหน้า
+  digitalWrite(MOTOR_R_IN1, HIGH);
+  digitalWrite(MOTOR_R_IN2, LOW);
+  analogWrite(MOTOR_R_ENABLE, TURN_SPEED);
+}
+
+// ฟังก์ชันหยุดมอเตอร์
+void stopMotors() {
+  // หยุดมอเตอร์ซ้าย
+  digitalWrite(MOTOR_L_IN1, LOW);
+  digitalWrite(MOTOR_L_IN2, LOW);
+  analogWrite(MOTOR_L_ENABLE, 0);
+  
+  // หยุดมอเตอร์ขวา
+  digitalWrite(MOTOR_R_IN1, LOW);
+  digitalWrite(MOTOR_R_IN2, LOW);
+  analogWrite(MOTOR_R_ENABLE, 0);
+}
 
