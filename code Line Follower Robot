@@ -1,1 +1,97 @@
+//========= Pin Definitions =========
+#define SENSOR_LEFT_PIN   2
+#define SENSOR_RIGHT_PIN  3
+#define MOTOR_L_ENABLE    5
+#define MOTOR_L_IN1       6
+#define MOTOR_L_IN2       7
+#define MOTOR_R_ENABLE    10
+#define MOTOR_R_IN1       8
+#define MOTOR_R_IN2       9
 
+// Sensor Logic
+#define ON_THE_RING  LOW
+#define ON_THE_EDGE  HIGH
+
+// -------- Motor Speeds (‑15 %) --------
+const float  SPEED_SCALE     = 0.85;          // 85 % of original
+const int    MOVE_SPEED      = int(200 * SPEED_SCALE);   // 170
+const int    BACKWARD_SPEED  = int(200 * SPEED_SCALE);   // 170
+
+// Back‑up time (~15 cm) –‑ไม่ต้องเปลี่ยน
+const unsigned int BACKWARD_TIME_MS = 300;
+
+//========= Setup =========
+void setup() {
+  pinMode(SENSOR_LEFT_PIN,  INPUT);
+  pinMode(SENSOR_RIGHT_PIN, INPUT);
+
+  pinMode(MOTOR_L_ENABLE, OUTPUT);
+  pinMode(MOTOR_L_IN1,    OUTPUT);
+  pinMode(MOTOR_L_IN2,    OUTPUT);
+
+  pinMode(MOTOR_R_ENABLE, OUTPUT);
+  pinMode(MOTOR_R_IN1,    OUTPUT);
+  pinMode(MOTOR_R_IN2,    OUTPUT);
+
+  Serial.begin(9600);
+  stopMotors();
+  delay(1000);
+}
+
+//========= Main Loop =========
+void loop() {
+  int leftState  = digitalRead(SENSOR_LEFT_PIN);
+  int rightState = digitalRead(SENSOR_RIGHT_PIN);
+
+  if (leftState == ON_THE_RING && rightState == ON_THE_RING) {
+    moveForward();
+  } else {
+    Serial.println("Edge detected → Back up!");
+    moveBackward(BACKWARD_TIME_MS);
+    stopMotors();
+    delay(100);
+  }
+}
+
+//========= Motor Helpers =========
+void moveForward() {
+  motorLeftForward(MOVE_SPEED);
+  motorRightForward(MOVE_SPEED);
+}
+
+void moveBackward(unsigned int ms) {
+  motorLeftBackward(BACKWARD_SPEED);
+  motorRightBackward(BACKWARD_SPEED);
+  delay(ms);
+}
+
+void stopMotors() {
+  analogWrite(MOTOR_L_ENABLE, 0);
+  analogWrite(MOTOR_R_ENABLE, 0);
+  digitalWrite(MOTOR_L_IN1, LOW);
+  digitalWrite(MOTOR_L_IN2, LOW);
+  digitalWrite(MOTOR_R_IN1, LOW);
+  digitalWrite(MOTOR_R_IN2, LOW);
+}
+
+// Low‑level motor direction functions
+void motorLeftForward(int speedVal) {
+  digitalWrite(MOTOR_L_IN1, HIGH);
+  digitalWrite(MOTOR_L_IN2, LOW);
+  analogWrite(MOTOR_L_ENABLE, speedVal);
+}
+void motorLeftBackward(int speedVal) {
+  digitalWrite(MOTOR_L_IN1, LOW);
+  digitalWrite(MOTOR_L_IN2, HIGH);
+  analogWrite(MOTOR_L_ENABLE, speedVal);
+}
+void motorRightForward(int speedVal) {
+  digitalWrite(MOTOR_R_IN1, HIGH);
+  digitalWrite(MOTOR_R_IN2, LOW);
+  analogWrite(MOTOR_R_ENABLE, speedVal);
+}
+void motorRightBackward(int speedVal) {
+  digitalWrite(MOTOR_R_IN1, LOW);
+  digitalWrite(MOTOR_R_IN2, HIGH);
+  analogWrite(MOTOR_R_ENABLE, speedVal);
+}
