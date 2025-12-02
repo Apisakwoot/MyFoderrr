@@ -6,30 +6,30 @@ void loop() {
 
   // แสดงค่าที่อ่านได้ของเซนเซอร์
   Serial.print("Left: "); Serial.print(left);
-  Serial.print("  Right: "); Serial.println(right);
+  Serial.print("Right: "); Serial.println(right);
 
-  // เดินตรง (left == HIGH && right == HIGH) <-- คือค่าที่เซนเซอร์ตรวจจับได้ HIGH คือเจอสีขาว
-  if (left == HIGH && right == HIGH) {
+  // เดินตรง (left == 0 && right == 0) <-- คือค่าที่เซนเซอร์ตรวจจับได้ HIGH คือเจอสีขาว
+  if (left == 0 && right == 0) {
     StartForward();
   }
   
-  // เลี้ยวขวา (left == LOW && right == HIGH) <-- คือค่าที่เซนเซอร์ตรวจจับได้ LOW คือเจอสีดำทางซ้าย 
-  else if (left == LOW && right == HIGH){
+  // เลี้ยวขวา (left == 1 && right == 0) <-- คือค่าที่เซนเซอร์ตรวจจับได้ 1 คือเจอสีดำทางซ้าย 
+  else if (left == 1 && right == 0){
     StartturnRight();
     delay(50); // ปรับค่าเวลาเลี้ยว
   }
 
-  // เลี้ยวซ้าย (left == HIGH && right == LOW) <-- คือค่าที่เซนเซอร์ตรวจจับได้ HIGH คือเจอสีดำทางขวา
-  else if (left == HIGH && right == LOW){
+  // เลี้ยวซ้าย (left == 0 && right == 1) <-- คือค่าที่เซนเซอร์ตรวจจับได้ 1 คือเจอสีดำทางขวา
+  else if (left == 0 && right == 1){
     StartturnLeft();
     delay(50); // ปรับค่าเวลาเลี้ยว
   }
 
-// ทำให้เดินตามลำดับคำสั่งเมื่อมีทางเลี้ยวที่ต่างกัน (left == LOW && right == LOW) <-- คือค่าที่เซนเซอร์ตรวจจับได้ LOW คือเจอสีดำ
-  else if (left == LOW && right == LOW) {
+// ทำให้เดินตามลำดับคำสั่งเมื่อมีทางเลี้ยวที่ต่างกัน (left == 1 && right == 1) <-- คือค่าที่เซนเซอร์ตรวจจับได้ 1 คือเจอสีดำ
+  else if (left == 1 && right == 1) {
     StopMoter();
-    delay(100);
 
+    
     junctionCount++; // เพิ่มจำนวนครั้งที่เจอทางที่ต่างกัน
 
 
@@ -139,4 +139,5 @@ void loop() {
 
     }
   }
+
 }
