@@ -16,9 +16,9 @@ void loop() {
   // เดินตรง (left == 0 && right == 0) <-- คือค่าที่เซนเซอร์ตรวจจับได้ HIGH คือเจอสีขาว
   if (left == 0 && right == 0) {
     StartForward();
-    
     if (isJunction) { // ตรวจสอบว่าเพิ่งออกจากแยกหรือไม่
         isJunction = false; 
+        delay(200);
     }
   }
   
@@ -27,17 +27,14 @@ void loop() {
   else if (left == 1 && right == 0){
 
     StartturnLeft();
-    
-    
     isJunction = false; // ยืนยันว่ากลับสู่การติดตามเส้นปกติ
-  
+    delay(200);
   }
 
   // เลี้ยวซ้าย (left == 0 && right == 1) <-- คือค่าที่เซนเซอร์ตรวจจับได้ 1 คือเจอสีดำทางขวา
   else if (left == 0 && right == 1){
 
-    StartturnRight();
-    
+    StartturnRight(); 
     isJunction = false; // ยืนยันว่ากลับสู่การติดตามเส้นปกติ
   }
 
@@ -49,24 +46,28 @@ void loop() {
     junctionCount++;        // เพิ่มจำนวนครั้งที่เจอทางที่ต่างกัน
         
         if (junctionCount == 1) {
-      StopMoter(); delay(200);
+      StopMoter(); delay(300);
       StartBackward(); delay(300);
-      RotatRight();   delay(430);
+      RotatRight();   delay(400);
+      StopMoter(); delay(400);
     }
     else if (junctionCount == 2) {
-      StopMoter(); delay(200);
+      StopMoter(); delay(300);
       StartBackward(); delay(300);
-      RotatRight();   delay(430);
+      RotatRight();   delay(400);
+      StopMoter(); delay(400);
     }
     else if (junctionCount == 3) {
-      StopMoter(); delay(200);
+      StopMoter(); delay(300);
       StartBackward(); delay(300);
-      RotatRight();   delay(430);
+      RotatRight();   delay(400);
+      StopMoter(); delay(400);
     }
     else if (junctionCount == 4) {
-      StopMoter(); delay(200);
+      StopMoter(); delay(300);
       StartBackward(); delay(300);
       RotatLeft();   delay(430);
+      StopMoter(); delay(400);
     }
   }
 }
